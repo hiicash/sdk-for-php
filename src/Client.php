@@ -69,10 +69,10 @@ class Client
         $body = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $payload = $headers['HiicashPay-Timestamp'] . "\n" . $headers['HiicashPay-Nonce'] . "\n" . $body . "\n";
 
-        return $this->generateSignature($payload);
+        return $this->generate_signature($payload);
     }
 
-    protected function generateSignature(string $payload): string
+    protected function generate_signature(string $payload): string
     {
         // 使用 HMAC-SHA512 算法生成签名
         $hash = hash_hmac("sha512", $payload, $this->secretKey, true);
@@ -88,7 +88,6 @@ class Client
         $data['version'] = '1.0';
 
         $headers = [
-            'Content-Type' => 'application/json',
             'HiicashPay-Timestamp' => $this->get_millisecond(),
             'HiicashPay-Nonce' => md5(time()),
             'HiicashPay-AppId' => $this->appId
@@ -101,19 +100,23 @@ class Client
         $jsonStr = json_encode($data);
 
         if ($method === 'POST') {
-            return $this->post_curl($uri, $jsonStr, $httpHeaders);
+            return $this->http_post_json($uri, $jsonStr, $httpHeaders);
         }
 
         return false;
     }
 
-    protected function post_curl(string $uri, string $jsonStr, array $headers, array $options = [])
+    protected function http_post_json(string $uri, string $jsonStr, array $headers, array $options = [])
     {
         $ch = curl_init($this->apiUrl . $uri);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonStr);
+
+        $headers[] = 'Content-Type:application/json; charset=utf-8';
+        $headers[] = 'Content-Length: ' . strlen($jsonStr);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
         if (!empty($options)) {
             curl_setopt_array($ch, $options);
         }
