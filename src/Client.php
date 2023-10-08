@@ -4,6 +4,7 @@ namespace HiiCash\Order;
 
 class Client
 {
+    private $publishUrl = 'https://hiicash.oss-ap-northeast-1.aliyuncs.com/gateway.txt';
     private $apiUrl;
     private $mchNo;
     private $appId;
@@ -13,12 +14,20 @@ class Client
         string $mchNo,
         string $appId,
         string $secretKey,
-        string $apiUrl = 'https://pay.hiicash.app/'
+        string $apiUrl = null
     ) {
         $this->mchNo = $mchNo;
         $this->appId = $appId;
         $this->secretKey = $secretKey;
         $this->apiUrl = $apiUrl;
+        $this->checkApiUrl();
+    }
+
+    private function checkApiUrl()
+    {
+        if ($this->apiUrl === null) {
+            $this->apiUrl = file_get_contents($this->publishUrl);
+        }
     }
 
     /*
@@ -61,7 +70,7 @@ class Client
     {
         list($mse, $sec) = explode(' ', microtime());
 
-        return (int)sprintf('%.0f', ((float)$mse + (float)$sec) * 1000);
+        return (int) sprintf('%.0f', ((float) $mse + (float) $sec) * 1000);
     }
 
     protected function sign(array $data, array $headers): string
@@ -117,7 +126,7 @@ class Client
         $headers[] = 'Content-Length: ' . strlen($jsonStr);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-        if (!empty($options)) {
+        if (! empty($options)) {
             curl_setopt_array($ch, $options);
         }
         $execute = curl_exec($ch);
