@@ -104,9 +104,9 @@ class Client
         $headers['HiicashPay-Signature'] = $this->sign($data, $headers);
         $httpHeaders = [];
         foreach ($headers as $key => $header) {
-            $httpHeaders[] = $key . ':' . $header;
+            $httpHeaders[] = $key . ': ' . $header;
         }
-        $jsonStr = json_encode($data);
+        $jsonStr = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         if ($method === 'POST') {
             return $this->http_post_json($uri, $jsonStr, $httpHeaders);
@@ -122,7 +122,7 @@ class Client
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonStr);
 
-        $headers[] = 'Content-Type:application/json; charset=utf-8';
+        $headers[] = 'Content-Type: application/json; charset=utf-8';
         $headers[] = 'Content-Length: ' . strlen($jsonStr);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
