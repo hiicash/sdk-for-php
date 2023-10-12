@@ -36,6 +36,14 @@ class Client
      */
     public function create(array $data)
     {
+        // hook data
+        if (isset($data['body'])) {
+            if (isset($data['body']['title'])) {
+                $data['body'] = [$data['body']];
+            }
+            $data['body'] = json_encode($data['body'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
         return $this->merge('POST', 'pay/order/create', $data);
     }
 
