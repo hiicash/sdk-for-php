@@ -71,7 +71,13 @@ class Client
      */
     public function check_notify(array $data, array $headers): bool
     {
-        return ($this->sign($data, $headers) === $headers['HiicashPay-Signature']);
+        return ($this->sign($data, $headers) === $this->header($headers, 'HiicashPay-Signature'));
+    }
+
+    public function notify_msg($code = 'success', $msg = '')
+    {
+        return json_encode(['returnCode' => $code, 'returnMsg' => $msg],
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     protected function get_millisecond(): int
@@ -81,10 +87,16 @@ class Client
         return (int) sprintf('%.0f', ((float) $mse + (float) $sec) * 1000);
     }
 
+    protected function header($headers, $key)
+    {
+        return $headers[$key] ?? $headers[strtolower($key)];
+    }
+
     protected function sign(array $data, array $headers): string
     {
         $body = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $payload = $headers['HiicashPay-Timestamp'] . "\n" . $headers['HiicashPay-Nonce'] . "\n" . $body . "\n";
+        $payload = $this->header($headers, 'HiicashPay-Timestamp') . "\n" .
+            $this->header($headers, 'HiicashPay-Nonce') . "\n" . $body . "\n";
 
         return $this->generate_signature($payload);
     }
