@@ -34,7 +34,7 @@ $data = [
     'amount' => 100, // 支付金额
     'currency' => 'cny', // 货币代码
     'subject' => 'mate 60', // 商品标题
-    'body' => '华为手机 Mate60 Pro+', // 商品描述
+    'body' => [["title" => "华为手机 Mate60 Pro+", "price" => 100, "qt" => 1]],  // 商品描述
 ];
 
 $ret = $client->create($data);    // 创建订单
