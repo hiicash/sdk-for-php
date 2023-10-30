@@ -89,7 +89,8 @@ class Client
 
     protected function header($headers, $key)
     {
-        return $headers[$key] ?? $headers[strtolower($key)];
+        $header = $headers[$key] ?? $headers[strtolower($key)];
+        return is_array($header) ? $header[0] : $header;
     }
 
     protected function sign(array $data, array $headers): string
