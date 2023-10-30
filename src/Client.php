@@ -71,6 +71,9 @@ class Client
      */
     public function check_notify(array $data, array $headers): bool
     {
+        foreach ($data as $key => $datum) {
+            $data[$key] = $datum ?? "";
+        }
         return ($this->sign($data, $headers) === $this->header($headers, 'HiicashPay-Signature'));
     }
 
